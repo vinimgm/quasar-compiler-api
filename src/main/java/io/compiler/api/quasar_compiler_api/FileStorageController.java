@@ -28,10 +28,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.compiler.core.QuasarGrammarLexer;
 import io.compiler.core.QuasarGrammarParser;
 import io.compiler.core.ast.Program;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("api/files")
+@Tag(name = "api/files")
 public class FileStorageController {
 
     private final Path fileStorageLocation;
@@ -41,6 +45,9 @@ public class FileStorageController {
             .toAbsolutePath().normalize();
     }
 
+    @Operation(description = "Realiza o upload de arquivos", method = "POST")
+    @ApiResponse(responseCode = "200", description = "Download realizado com sucesso")
+    @ApiResponse(responseCode = "500", description = "Erro ao realizar o download")
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -101,6 +108,9 @@ public class FileStorageController {
     }
 
 
+    @Operation(description = "Realiza o download de arquivos", method = "GET")
+    @ApiResponse(responseCode = "200", description = "Download realizado com sucesso")
+    @ApiResponse(responseCode = "500", description = "Erro ao realizar o download")
     @GetMapping("/download/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) 
         throws IOException {
@@ -123,6 +133,9 @@ public class FileStorageController {
         }
     }
 
+    @Operation(description = "Realiza a listagem de arquivos enviados e gerados", method = "GET")
+    @ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso")
+    @ApiResponse(responseCode = "500", description = "Erro ao realizar a listagem")
     @GetMapping("/list")
     public ResponseEntity<List<String>> listFiles() {
         try {
